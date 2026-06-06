@@ -425,7 +425,7 @@ header {
 
 /* Submit Action Trigger Button */
 .submit-action-container {
-  margin-top: 16px; /* 16 pixel gap */
+  margin-top: 40px; /* Moved 24px down (originally 16px) */
   display: flex;
   justify-content: center;
   width: 100%;
