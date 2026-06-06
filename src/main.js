@@ -28,6 +28,10 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-DM9FwxnTqy8KJ9g2Q
  * Parses raw Google Sheet CSV output into structured resources JSON array
  */
 function parseCsv(text) {
+  // Strip UTF-8 BOM if present (common in Google Sheets CSV exports)
+  if (text.charCodeAt(0) === 0xFEFF) {
+    text = text.slice(1);
+  }
   const lines = text.split('\n').map(line => line.trim()).filter(Boolean);
   if (lines.length < 2) return [];
   
