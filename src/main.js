@@ -254,7 +254,7 @@ function openCategoryDrawer(category, allResources) {
             <h3 class="resource-title">${item.title}</h3>
             ${item.tag ? `<span class="resource-badge">${item.tag}</span>` : ''}
           </div>
-          <p class="resource-desc">${item.description}</p>
+          <p class="resource-desc">${item.description || ''}</p>
         </div>
         <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="btn-primary" id="${linkId}">
           Visit
