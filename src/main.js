@@ -2,11 +2,25 @@
 function getResourcesData() {
   const local = localStorage.getItem('resourcesData');
   if (local) {
-    return JSON.parse(local);
+    try {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    } catch (e) {
+      console.error('Error parsing localStorage resourcesData, resetting to defaults:', e);
+      localStorage.removeItem('resourcesData');
+    }
   }
+  
   if (window.defaultResources) {
-    localStorage.setItem('resourcesData', JSON.stringify(window.defaultResources));
-    return window.defaultResources;
+    try {
+      localStorage.setItem('resourcesData', JSON.stringify(window.defaultResources));
+      return window.defaultResources;
+    } catch (e) {
+      console.error('Failed to write default resources to localStorage:', e);
+      return window.defaultResources;
+    }
   }
   return [];
 }
@@ -32,16 +46,28 @@ function parseCsv(text) {
   if (text.charCodeAt(0) === 0xFEFF) {
     text = text.slice(1);
   }
+  
   const lines = text.split('\n').map(line => line.trim()).filter(Boolean);
   if (lines.length < 2) return [];
   
   const headers = splitCsvRow(lines[0]);
   
+  // Validation: Ensure headers actually contain standard category/title keys.
+  // If Google redirects to an HTML error page, this check will prevent parsing failures.
+  const hasRequiredHeaders = headers.some(h => {
+    const clean = h.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return clean === 'category' || clean === 'title';
+  });
+  
+  if (!hasRequiredHeaders) {
+    throw new Error('CSV headers are invalid or missing required columns');
+  }
+  
   return lines.slice(1).map((line, idx) => {
     const values = splitCsvRow(line);
     const item = { id: String(idx + 1) };
     headers.forEach((header, i) => {
-      const cleanHeader = header.toLowerCase().replace(/["'\s]/g, '');
+      const cleanHeader = header.toLowerCase().replace(/[^a-z0-9]/g, '');
       const cleanVal = values[i] ? values[i].replace(/^["']|["']$/g, '').trim() : '';
       item[cleanHeader] = cleanVal;
     });
@@ -74,7 +100,7 @@ function splitCsvRow(row) {
  */
 async function fetchResources() {
   try {
-    loadingState.classList.add('active');
+    if (loadingState) loadingState.classList.add('active');
     
     // Fetch live Google Sheets CSV (using cache-buster timestamp query)
     const response = await fetch(CSV_URL + '&_t=' + new Date().getTime());
@@ -87,23 +113,46 @@ async function fetchResources() {
     }
     
     // Load local submissions (stored in localStorage) to show them immediately
-    const local = localStorage.getItem('resourcesData');
     let localSubmissions = [];
-    if (local) {
-      const parsed = JSON.parse(local);
-      localSubmissions = parsed.filter(item => item.tag === 'Submitted');
+    try {
+      const local = localStorage.getItem('resourcesData');
+      if (local) {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed)) {
+          localSubmissions = parsed.filter(item => item.tag === 'Submitted');
+        }
+      }
+    } catch (e) {
+      console.error('Error merging local submissions:', e);
     }
     
     const combinedResources = [...resources, ...localSubmissions];
-    localStorage.setItem('resourcesData', JSON.stringify(combinedResources));
+    try {
+      localStorage.setItem('resourcesData', JSON.stringify(combinedResources));
+    } catch (e) {
+      console.error('Failed to cache combined resources:', e);
+    }
     return combinedResources;
     
   } catch (error) {
     console.error('Error loading Google Sheet data, using localStorage/default resources fallback:', error);
+    
+    // Graceful self-healing fallback
     const local = localStorage.getItem('resourcesData');
-    return local ? JSON.parse(local) : resourcesData;
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      } catch (e) {
+        console.error('Failed to parse fallback resources from localStorage:', e);
+        localStorage.removeItem('resourcesData');
+      }
+    }
+    return resourcesData;
   } finally {
-    loadingState.classList.remove('active');
+    if (loadingState) loadingState.classList.remove('active');
   }
 }
 
@@ -111,26 +160,40 @@ async function fetchResources() {
  * Initializes the web app, loads resource data, and renders the UI
  */
 async function init() {
-  const resources = await fetchResources();
-  
-  // Extract unique categories from dataset
-  const categories = [...new Set(resources.map(item => item.category))];
-  
-  // Render category cards
-  renderCategoryCards(categories, resources);
-  
-  // Set up drawer close listeners
-  setupDrawerListeners();
+  try {
+    const resources = await fetchResources();
+    
+    // Extract unique categories from dataset, filtering out empty or invalid categories
+    const categories = [...new Set(resources.map(item => item.category).filter(Boolean))];
+    
+    // Render category cards
+    renderCategoryCards(categories, resources);
+    
+    // Set up drawer close listeners
+    setupDrawerListeners();
 
-  // Set up Submission Modal listeners
-  setupSubmitModal(categories);
+    // Set up Submission Modal listeners
+    setupSubmitModal(categories);
+  } catch (error) {
+    console.error('Initialization failed:', error);
+  }
 }
 
 /**
  * Renders the category cards onto the main grid
  */
 function renderCategoryCards(categories, allResources) {
+  if (!categoriesGrid) return;
   categoriesGrid.innerHTML = '';
+  
+  if (categories.length === 0) {
+    categoriesGrid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #cce6ff;">
+        <p>No categories found. Click "Submit Resource" to add one!</p>
+      </div>
+    `;
+    return;
+  }
   
   categories.forEach(category => {
     // Create Card element
@@ -168,16 +231,13 @@ function renderCategoryCards(categories, allResources) {
 }
 
 /**
- * Filters resources by category and populates the details drawer/modal
+ * Filters resources by category and populates the details drawer/modal (drawer UI left for index fallback)
  */
 function openCategoryDrawer(category, allResources) {
-  // Filter resources under this specific category
+  if (!drawerCategoryTitle || !drawerResourcesContainer || !drawerOverlay) return;
+  
   const filtered = allResources.filter(item => item.category === category);
-  
-  // Set drawer title
   drawerCategoryTitle.textContent = category;
-  
-  // Render resources inside the drawer
   drawerResourcesContainer.innerHTML = '';
   
   if (filtered.length === 0) {
@@ -186,7 +246,6 @@ function openCategoryDrawer(category, allResources) {
     filtered.forEach(item => {
       const resourceEl = document.createElement('div');
       resourceEl.className = 'resource-item';
-      
       const linkId = `link-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
       
       resourceEl.innerHTML = `
@@ -205,44 +264,42 @@ function openCategoryDrawer(category, allResources) {
           </svg>
         </a>
       `;
-      
       drawerResourcesContainer.appendChild(resourceEl);
     });
   }
   
-  // Open Drawer UI (Animate and set aria flags)
   drawerOverlay.classList.add('active');
   drawerOverlay.setAttribute('aria-hidden', 'false');
-  document.body.style.overflow = 'hidden'; // Lock background scrolling
-  
-  // Focus close button for accessibility
-  setTimeout(() => drawerCloseBtn.focus(), 100);
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => {
+    if (drawerCloseBtn) drawerCloseBtn.focus();
+  }, 100);
 }
 
 /**
  * Closes the category drawer
  */
 function closeCategoryDrawer() {
+  if (!drawerOverlay) return;
   drawerOverlay.classList.remove('active');
   drawerOverlay.setAttribute('aria-hidden', 'true');
-  document.body.style.overflow = ''; // Restore background scrolling
+  document.body.style.overflow = '';
 }
 
 /**
  * Binds closing events to the drawer component
  */
 function setupDrawerListeners() {
-  // Close button click
+  if (!drawerCloseBtn || !drawerOverlay) return;
+  
   drawerCloseBtn.addEventListener('click', closeCategoryDrawer);
   
-  // Backdrop click
   drawerOverlay.addEventListener('click', (e) => {
     if (e.target === drawerOverlay) {
       closeCategoryDrawer();
     }
   });
   
-  // Escape key close
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && drawerOverlay.classList.contains('active')) {
       closeCategoryDrawer();
@@ -346,11 +403,11 @@ function setupSubmitModal(categories) {
       }
       
       // Disable inputs and button
-      const submitBtn = submitForm.querySelector('button[type="submit"]');
+      const submitBtnEl = submitForm.querySelector('button[type="submit"]');
       const inputs = submitForm.querySelectorAll('input, select');
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting...';
+      if (submitBtnEl) {
+        submitBtnEl.disabled = true;
+        submitBtnEl.textContent = 'Submitting...';
       }
       inputs.forEach(input => input.disabled = true);
 
@@ -378,8 +435,8 @@ function setupSubmitModal(categories) {
         localStorage.setItem('resourcesData', JSON.stringify(resourcesData));
 
         // Re-render categories card list to update categories data
-        const categories = [...new Set(resourcesData.map(item => item.category))];
-        renderCategoryCards(categories, resourcesData);
+        const categoriesList = [...new Set(resourcesData.map(item => item.category).filter(Boolean))];
+        renderCategoryCards(categoriesList, resourcesData);
 
         alert(`Success!\n\nThe resource "${title}" has been successfully added to the "${category}" category.`);
         closeSubmitModal();
@@ -390,9 +447,9 @@ function setupSubmitModal(categories) {
       })
       .finally(() => {
         // Re-enable form inputs
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Submit';
+        if (submitBtnEl) {
+          submitBtnEl.disabled = false;
+          submitBtnEl.textContent = 'Submit';
         }
         inputs.forEach(input => input.disabled = false);
       });

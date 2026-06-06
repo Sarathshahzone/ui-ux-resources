@@ -12,7 +12,15 @@ const categoryHeading = document.getElementById('category-heading');
 function getResources() {
   const local = localStorage.getItem('resourcesData');
   if (local) {
-    return JSON.parse(local);
+    try {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    } catch (e) {
+      console.error('Error parsing localStorage resourcesData in category:', e);
+      localStorage.removeItem('resourcesData');
+    }
   }
   
   // Initialize with defaults if empty
