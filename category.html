@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Optimization -->
+  <title>Category Resources - UI UX Resources</title>
+  <meta name="description" content="Discover top-tier curated links and assets for this category.">
+  
+  <!-- Google Fonts Connection -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="./src/styles.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header Area (Same line header-top layout) -->
+    <header class="app-header">
+      <div class="header-top">
+        <h1 id="category-heading" class="page-title">Category Name</h1>
+        <a href="./index.html" class="btn-help" style="text-decoration: none;">Back</a>
+      </div>
+      <!-- No subtitle paragraph as requested -->
+    </header>
+
+    <!-- Resources Grid -->
+    <main>
+      <section id="resources-grid" class="cards-grid" aria-label="Category Resources">
+        <!-- Rendered dynamically by category.js -->
+      </section>
+    </main>
+  </div>
+
+  <!-- Shared Global Data -->
+  <script src="./src/data/resources.js"></script>
+  <!-- Page Controller Script -->
+  <script src="./src/category.js"></script>
+</body>
+</html>

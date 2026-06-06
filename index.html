@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Optimization -->
+  <title>UI UX Resources - Curated Assets for Designers</title>
+  <meta name="description" content="Discover top-tier design systems, icon libraries, fonts, and inspiration tools. A mobile-first, high-performance curation resource built for professional UI/UX designers.">
+  
+  <!-- Google Fonts Connection -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="./src/styles.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header Area -->
+    <header class="app-header">
+      <div class="header-top">
+        <h1 id="main-heading" class="page-title">UI UX Resources</h1>
+        <a id="lets-grow-btn" href="https://www.instagram.com/design_resauce?igsh=MWdidGVwMGppbGg2cw==" target="_blank" rel="noopener noreferrer" class="btn-help" style="text-decoration: none;">Let's grow</a>
+      </div>
+      <p class="page-subtitle">A curated collection of design resources, assets, and tools.</p>
+    </header>
+
+    <!-- Loading State (For future Google Sheets API load) -->
+    <div id="loading-state" class="loading-indicator">
+      <span>Fetching curated catalog...</span>
+    </div>
+
+    <!-- Categories Card Grid -->
+    <main>
+      <section id="categories-grid" class="cards-grid" aria-label="Resource Categories">
+        <!-- Rendered dynamically by main.js -->
+      </section>
+      
+      <!-- Submit Resource Button Trigger -->
+      <div class="submit-action-container">
+        <button id="btn-submit-resource" class="btn-submit-trigger">Submit Resource</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Dynamic Resource Detail Drawer (Accessible Modal Pattern) -->
+  <div id="drawer-overlay" class="drawer-overlay" aria-hidden="true">
+    <div class="drawer-content" role="dialog" aria-modal="true" aria-labelledby="drawer-category-title">
+      <div class="drawer-header">
+        <h2 id="drawer-category-title" class="drawer-title">Category Name</h2>
+        <button id="drawer-close-btn" class="drawer-close" aria-label="Close details panel">✕</button>
+      </div>
+      <div id="drawer-resources-container" class="resource-list">
+        <!-- Resource list items rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Resource Modal (Vertically Centered) -->
+  <div id="submit-modal-overlay" class="modal-overlay" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <h2 id="modal-title" class="modal-title">Submit Resource</h2>
+        <button id="modal-close-btn" class="modal-close" aria-label="Close submission form">✕</button>
+      </div>
+      <form id="submit-resource-form" class="modal-form">
+        <div class="form-group">
+          <label for="form-category" class="form-label">Category</label>
+          <select id="form-category" class="form-select" required>
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="form-title" class="form-label">Resource Name (Max 20 characters)</label>
+          <input type="text" id="form-title" class="form-input" maxlength="20" placeholder="e.g. Material Design" required>
+        </div>
+        <div class="form-group">
+          <label for="form-url" class="form-label">Resource Link (Optional)</label>
+          <input type="url" id="form-url" class="form-input" placeholder="e.g. https://m3.material.io">
+          <span id="form-url-error" class="error-text"></span>
+        </div>
+        <button type="submit" class="btn-primary form-submit-btn">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Shared Global Data -->
+  <script src="./src/data/resources.js"></script>
+  <!-- Main JavaScript File -->
+  <script src="./src/main.js"></script>
+</body>
+</html>

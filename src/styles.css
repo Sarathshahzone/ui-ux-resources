@@ -1,0 +1,609 @@
+/* Modern Reset & Base Setup */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --font-title: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  /* Color Palette */
+  --bg-blue-gradient: linear-gradient(135deg, #1E90FF 0%, #0a4da3 100%);
+  --bg-blue-fallback: #1E90FF;
+  
+  --card-bg: #ffffff;
+  --card-title-color: #000000; /* Pure Black */
+  
+  --btn-blue: #1E90FF; /* Dodger Blue (#1E90FF) */
+  --btn-blue-hover: rgba(30, 144, 255, 0.08);
+  --btn-blue-active: rgba(30, 144, 255, 0.15);
+  
+  --text-white: #ffffff;
+  --text-muted: #6b7280;
+  
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-blue-fallback);
+  background: var(--bg-blue-gradient);
+  min-height: 100vh;
+  color: var(--text-white);
+  padding: 24px;
+  overflow-x: hidden;
+}
+
+/* Page Layout */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 0 48px;
+}
+
+header {
+  margin-bottom: 40px;
+  text-align: left;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  width: 100%;
+  gap: 16px;
+}
+
+.btn-help {
+  font-family: var(--font-title);
+  font-size: 12px; /* 12 pixels */
+  color: var(--btn-blue); /* Blue color (#1E90FF) */
+  font-weight: 600; /* Semi bold */
+  background-color: #ffffff; /* White background */
+  border-radius: 8px; /* 8px corner radius */
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+
+.btn-help:hover {
+  opacity: 0.9;
+}
+
+.btn-help:active {
+  transform: scale(0.97);
+}
+
+.page-title {
+  font-family: var(--font-title);
+  font-weight: 600; /* Semibold */
+  font-size: 28px; /* Reduced to exactly 28px */
+  color: var(--text-white);
+  letter-spacing: -0.025em;
+  margin-bottom: 0; /* Align cleanly with the inline button */
+  position: relative;
+  display: inline-block;
+}
+
+.page-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 60px; /* Wider to show the full rainbow gradient beautifully */
+  height: 4px; /* Increased slightly for better definition */
+  background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
+  border-radius: 2px;
+}
+
+.page-subtitle {
+  font-size: 0.95rem;
+  color: #cce6ff;
+  font-weight: 400;
+}
+
+/* Card Grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two cards in each row */
+  gap: 16px; /* Reduced to 16px vertical and horizontal spacing */
+}
+
+/* Responsive columns scaling */
+@media (min-width: 600px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr); /* Tablet */
+  }
+}
+
+@media (min-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr); /* Large Tablet / Small Desktop */
+  }
+}
+
+@media (min-width: 1280px) {
+  .cards-grid {
+    grid-template-columns: repeat(4, 1fr); /* Large Desktop */
+  }
+}
+
+/* Category Card */
+.category-card {
+  background-color: var(--card-bg);
+  aspect-ratio: 1 / 1; /* 1:1 aspect ratio */
+  border-radius: 12px;
+  padding: 24px 16px 16px 16px; /* Top: 24px, Left/Right: 16px, Bottom: 16px */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch; /* Stretches button to full width */
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  text-align: left; /* Left align text */
+}
+
+/* Card Hover Animations */
+.category-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+
+.category-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--btn-blue) 0%, #80c4ff 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.category-card:hover::before {
+  opacity: 1;
+}
+
+.category-title {
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 16px; /* Reduced to 16px */
+  color: var(--card-title-color);
+  line-height: 1.2;
+}
+
+/* Secondary Button Style */
+.btn-secondary {
+  border: 1px solid var(--btn-blue); /* 1 pixel stroke in blue */
+  background: transparent;
+  color: var(--btn-blue); /* Blue color */
+  font-size: 14px; /* 14 pixel text size */
+  font-family: var(--font-title);
+  font-weight: 500;
+  border-radius: 8px; /* 8 pixel corner radius */
+  padding: 8px 20px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-secondary:hover {
+  background-color: var(--btn-blue-hover);
+}
+
+.btn-secondary:active {
+  background-color: var(--btn-blue-active);
+  transform: scale(0.98);
+}
+
+/* Premium Drawer/Modal Component */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(7, 14, 36, 0.6);
+  backdrop-filter: blur(12px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  display: flex;
+  justify-content: flex-end; /* Mobile: slides from bottom, Desktop: side drawer */
+  align-items: flex-end;
+}
+
+.drawer-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer-content {
+  background-color: #ffffff;
+  color: #111827;
+  width: 100%;
+  max-height: 85vh;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.2);
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow: hidden;
+}
+
+.drawer-overlay.active .drawer-content {
+  transform: translateY(0);
+}
+
+/* Desktop Styles for Drawer (Centering Modal) */
+@media (min-width: 768px) {
+  .drawer-overlay {
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+  }
+  .drawer-content {
+    width: 640px;
+    max-height: 80vh;
+    border-radius: 24px;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .drawer-overlay.active .drawer-content {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Drawer Header */
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 16px;
+}
+
+.drawer-title {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.drawer-close {
+  background: #f3f4f6;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #4b5563;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.drawer-close:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+/* Resource List Grid */
+.resource-list {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Custom Scrollbar for Drawer List */
+.resource-list::-webkit-scrollbar {
+  width: 6px;
+}
+.resource-list::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 3px;
+}
+.resource-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+.resource-list::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Resource Card */
+.resource-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.resource-item:hover {
+  border-color: rgba(30, 144, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.05);
+}
+
+.resource-info {
+  flex: 1;
+}
+
+.resource-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.resource-title {
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.resource-badge {
+  font-size: 0.75rem;
+  background-color: rgba(30, 144, 255, 0.08);
+  color: var(--btn-blue);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.resource-desc {
+  font-size: 0.85rem;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+/* Primary Visit Button inside Drawer */
+.btn-primary {
+  background-color: var(--btn-blue);
+  color: #ffffff;
+  border: none;
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+  background-color: #007ce6;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+/* Loading Overlay for future integration (Google Sheets fetch state) */
+.loading-indicator {
+  display: none;
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+  color: #93c5fd;
+}
+.loading-indicator.active {
+  display: block;
+}
+
+/* Submit Action Trigger Button */
+.submit-action-container {
+  margin-top: 16px; /* 16 pixel gap */
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.btn-submit-trigger {
+  background-color: #ffffff; /* Button color is white */
+  color: var(--btn-blue); /* Text color is blue (#1E90FF) */
+  font-family: var(--font-title);
+  font-weight: 600; /* Semi bold */
+  font-size: 15px;
+  border-radius: 8px; /* 8px corner radius */
+  padding: 12px 28px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-submit-trigger:hover {
+  background-color: #f9fafb;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-submit-trigger:active {
+  transform: translateY(0);
+  background-color: #f3f4f6;
+}
+
+/* Modal Overlay & Centered Modal Structure */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(7, 14, 36, 0.6);
+  backdrop-filter: blur(12px);
+  z-index: 1100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Vertical center of the page */
+  padding: 20px;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  color: #111827;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 16px;
+  padding: 28px 24px;
+  box-shadow: var(--shadow-lg);
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 12px;
+}
+
+.modal-title {
+  font-family: var(--font-title);
+  font-size: 18px; /* Set precisely to 18px */
+  font-weight: 600;
+  color: #111827;
+}
+
+.modal-close {
+  background: #f3f4f6;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #4b5563;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+/* Modal Form Styles */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.form-label {
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-input {
+  padding: 10px 12px;
+}
+
+.form-select {
+  padding: 10px 36px 10px 12px; /* 36px right padding for chevron spacing */
+  appearance: none; /* Style dropdown custom chevron */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234b5563'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.form-input, .form-select {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: #1f2937;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: var(--btn-blue);
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.15);
+}
+
+.form-submit-btn {
+  margin-top: 8px;
+  width: 100%;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  justify-content: center; /* Center align text inside primary button flex */
+}
+
+/* Validation Error Styles */
+.error-text {
+  color: #ef4444;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 4px;
+  display: none;
+  text-align: left;
+}
+
+.error-text.active {
+  display: block;
+}
